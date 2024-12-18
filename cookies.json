@@ -1,0 +1,82 @@
+[
+  {
+    "name": "verificationCodeTime",
+    "value": "1734265771",
+    "domain": "app.meckano.co.il",
+    "path": "/api/login",
+    "expires": 1734265772.004177,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_GRECAPTCHA",
+    "value": "09AJNbFnf9xZ7DpC_p7FvbS3MsAqbYEwfTIDhK43lrFlTvxW_8CCfDYhV6jEz0AVoJa_C5xwnGLGEKpQ-7dHuQlas",
+    "domain": "www.google.com",
+    "path": "/recaptcha",
+    "expires": 1749817479.104731,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "PHPSESSID",
+    "value": "aojb1uakmljm5rm8f1astho8hp",
+    "domain": ".app.meckano.co.il",
+    "path": "/",
+    "expires": 1734279841.60982,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "__utma",
+    "value": "205839299.1780436158.1734265443.1734265443.1734265443.1",
+    "domain": ".app.meckano.co.il",
+    "path": "/",
+    "expires": 1768825442.569261,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "__utmc",
+    "value": "205839299",
+    "domain": ".app.meckano.co.il",
+    "path": "/",
+    "expires": -1,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "__utmz",
+    "value": "205839299.1734265443.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)",
+    "domain": ".app.meckano.co.il",
+    "path": "/",
+    "expires": 1750033442,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "__utmt",
+    "value": "1",
+    "domain": ".app.meckano.co.il",
+    "path": "/",
+    "expires": 1734266042,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "__utmb",
+    "value": "205839299.1.10.1734265443",
+    "domain": ".app.meckano.co.il",
+    "path": "/",
+    "expires": 1734267242,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  }
+]
