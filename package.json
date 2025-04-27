@@ -1,5 +1,5 @@
 {
-  "name": "meckano-filler",
+  "name": "meckano-fill",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -9,9 +9,11 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.2"
+  },
   "dependencies": {
-    "googleapis": "^144.0.0",
-    "node-fetch": "^3.3.2",
-    "playwright": "^1.49.0"
+    "simple-git": "^3.27.0"
   }
 }
