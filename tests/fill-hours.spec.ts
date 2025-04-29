@@ -5,10 +5,46 @@ const password: string = process.env.PASSWORD!;
 
 /**
  * Clicks on a cell, fills it with the specified value, and validates the input.
- * Retries up to maxAttempts if validation fails.
+ * Skips filling if the cell already contains a value.
  */
 async function clickAndFill(cell: Locator, value: string) {
   const page = cell.page();
+
+  const inputLocator = cell.locator('input');
+  const timeSpan = cell.locator('span').nth(1); // span with visible text
+
+  const hasInput = await inputLocator.count() > 0;
+
+  if (hasInput) {
+    const isVisible = await inputLocator.isVisible();
+
+    let currentValue = '';
+
+    if (isVisible) {
+      currentValue = (await inputLocator.inputValue()).trim();
+      console.log(`Input is visible. Current input value: "${currentValue}"`);
+    } else {
+      // Fall back to reading the displayed span
+      currentValue = (await timeSpan.innerText()).trim();
+      console.log(`Input not visible. Current span value: "${currentValue}"`);
+    }
+
+    if (currentValue) {
+      console.log(`🔄 Skipping typing: Field already contains "${currentValue}"`);
+      return; // Already filled, no need to type
+    }
+  } else {
+    // 🚨 No input at all, fall back to checking span
+    const spanText = (await timeSpan.innerText()).trim();
+    console.log(`No input element found. Span value: "${spanText}"`);
+
+    if (spanText) {
+      console.log(`🔄 Skipping typing: Field already contains "${spanText}"`);
+      return;
+    }
+  }
+
+  // ✅ Only if really empty, we try to type
   const maxAttempts = 3;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -23,8 +59,6 @@ async function clickAndFill(cell: Locator, value: string) {
 
     await page.keyboard.press('Enter');
     await page.waitForTimeout(500);
-
-    const timeSpan = cell.locator('span').nth(1);
 
     try {
       await timeSpan.waitFor({ state: 'visible', timeout: 5000 });
