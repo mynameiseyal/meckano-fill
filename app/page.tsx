@@ -16,6 +16,101 @@ export default function Home() {
 
         {/* Main Content */}
         <div className="max-w-4xl mx-auto">
+          {/* Prerequisites Section */}
+          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+              🛠️ Prerequisites: Install Node.js & npm
+            </h2>
+            
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-yellow-800 font-medium">
+                ⚠️ <strong>Important:</strong> You need Node.js and npm installed on your computer before proceeding.
+              </p>
+            </div>
+
+            {/* Windows Installation */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                <span className="mr-2">🪟</span> Windows
+              </h3>
+              <ol className="list-decimal list-inside space-y-2 text-gray-700 ml-4">
+                <li>Go to <a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://nodejs.org/</a></li>
+                <li>Download the LTS version (recommended)</li>
+                <li>Run the installer and follow the setup wizard</li>
+                <li>Restart your computer after installation</li>
+              </ol>
+            </div>
+
+            {/* macOS Installation */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                <span className="mr-2">🍎</span> macOS
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-2">Option 1 (Recommended):</h4>
+                  <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-4">
+                    <li>Go to <a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://nodejs.org/</a></li>
+                    <li>Download the LTS version</li>
+                    <li>Run the .pkg installer</li>
+                  </ol>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-2">Option 2 (Using Homebrew):</h4>
+                  <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm">
+                    <span className="text-white">brew install node</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Linux Installation */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                <span className="mr-2">🐧</span> Ubuntu/Linux
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-2">Option 1 (Package Manager):</h4>
+                  <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm space-y-1">
+                    <div className="text-gray-400"># Update package index</div>
+                    <div className="text-white">sudo apt update</div>
+                    <div className="text-gray-400"># Install Node.js and npm</div>
+                    <div className="text-white">sudo apt install nodejs npm</div>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-2">Option 2 (Latest Version):</h4>
+                  <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm space-y-1">
+                    <div className="text-white">curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -</div>
+                    <div className="text-white">sudo apt-get install -y nodejs</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Verification */}
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h4 className="font-medium text-green-800 mb-2">✅ Verify Installation:</h4>
+              <p className="text-green-700 mb-2">Open terminal/command prompt and run:</p>
+              <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm space-y-1">
+                <div className="text-white">node --version</div>
+                <div className="text-white">npm --version</div>
+              </div>
+              <p className="text-green-700 mt-2 text-sm">Both commands should return version numbers.</p>
+            </div>
+
+            {/* Terminal Instructions */}
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-medium text-blue-800 mb-2">💻 How to Open Terminal/Command Prompt:</h4>
+              <ul className="space-y-1 text-blue-700 text-sm">
+                <li><strong>Windows:</strong> Right-click in folder → "Open in Terminal" or Shift+Right-click → "Open PowerShell"</li>
+                <li><strong>macOS:</strong> Right-click in Finder → "New Terminal at Folder" or drag folder to Terminal</li>
+                <li><strong>Linux:</strong> Right-click in file manager → "Open in Terminal"</li>
+              </ul>
+            </div>
+          </div>
+
           <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">
               🚀 Quick Start Guide
@@ -159,13 +254,34 @@ export default function Home() {
             {/* Support */}
             <div className="mt-8 p-6 bg-red-50 rounded-lg border border-red-200">
               <h3 className="text-lg font-semibold text-red-900 mb-4">
-                🆘 Need Help?
+                🆘 Troubleshooting
               </h3>
-              <div className="space-y-2 text-red-800">
-                <p>• Make sure your Meckano credentials are correct in the .env file</p>
-                <p>• Check that you have a stable internet connection</p>
-                <p>• If 2FA is enabled, be ready to complete it when prompted</p>
-                <p>• The script only fills empty timesheet entries - existing data is preserved</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-red-800 mb-2">Node.js/npm Issues:</h4>
+                  <ul className="space-y-1 text-red-700 text-sm ml-4">
+                    <li>• <strong>"npm is not recognized":</strong> Node.js not installed or not in PATH - restart terminal after installing</li>
+                    <li>• <strong>"Permission denied":</strong> Don't use sudo with npm commands (Mac/Linux)</li>
+                    <li>• <strong>Playwright download fails:</strong> Check disk space (~100MB needed) and internet connection</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-red-800 mb-2">Application Issues:</h4>
+                  <ul className="space-y-1 text-red-700 text-sm ml-4">
+                    <li>• Make sure your Meckano credentials are correct in the .env file</li>
+                    <li>• Check that you have a stable internet connection</li>
+                    <li>• If 2FA is enabled, be ready to complete it when prompted</li>
+                    <li>• The script only fills empty timesheet entries - existing data is preserved</li>
+                  </ul>
+                </div>
+                
+                <div className="p-3 bg-red-100 border border-red-300 rounded">
+                  <p className="text-red-800 text-sm">
+                    <strong>Still having issues?</strong> Try running: <code className="bg-red-200 px-1 rounded">node --version</code> and <code className="bg-red-200 px-1 rounded">npm --version</code> to verify Node.js is properly installed.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
