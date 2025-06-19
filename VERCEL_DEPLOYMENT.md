@@ -1,4 +1,8 @@
-# Vercel Deployment Guide
+# Meckano Fill - Vercel Deployment Guide
+
+<!-- Deployment trigger: Download functionality fixed - 2025-06-19 -->
+
+This guide covers deploying the Meckano Fill web interface to Vercel for easy project distribution.
 
 ## Quick Deploy
 
