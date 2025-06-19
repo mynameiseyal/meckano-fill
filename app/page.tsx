@@ -9,16 +9,30 @@ export default function Home() {
     try {
       setDownloadStatus('Preparing zip file...')
       
-      // Create a link to download the zip file
+      // Use fetch to get the file, then create blob URL
+      const response = await fetch('/api/download')
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      
+      // Create a link to download the blob
       const link = document.createElement('a')
-      link.href = '/api/download'
+      link.href = url
       link.download = 'meckano-fill.zip'
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
       
+      // Clean up the blob URL
+      window.URL.revokeObjectURL(url)
+      
       setDownloadStatus('Download started! Check your downloads folder.')
     } catch (error) {
+      console.error('Download error:', error)
       setDownloadStatus('Download failed. Please try again or use git clone method.')
     }
   }
