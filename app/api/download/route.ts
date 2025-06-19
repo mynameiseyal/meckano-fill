@@ -512,33 +512,120 @@ EXIT_END=18:00
     // Add installation instructions
     const installInstructions = `# Meckano Fill - Installation Instructions
 
-## Quick Setup
+## Prerequisites: Install Node.js and npm
 
-1. Extract this zip file to a folder on your computer
-2. Open terminal/command prompt in that folder
-3. Run: npm install
-4. Run: npx playwright install chromium
-5. Rename .env.example to .env and add your credentials
-6. Run: npm test
+**You need Node.js (which includes npm) installed on your computer first.**
+
+### Windows:
+1. Go to https://nodejs.org/
+2. Download the LTS version (recommended)
+3. Run the installer and follow the setup wizard
+4. Restart your computer after installation
+
+### macOS:
+**Option 1 (Recommended):**
+1. Go to https://nodejs.org/
+2. Download the LTS version
+3. Run the .pkg installer
+
+**Option 2 (Using Homebrew):**
+\`\`\`bash
+brew install node
+\`\`\`
+
+### Ubuntu/Linux:
+**Option 1 (Using package manager):**
+\`\`\`bash
+# Update package index
+sudo apt update
+
+# Install Node.js and npm
+sudo apt install nodejs npm
+
+# Verify installation
+node --version
+npm --version
+\`\`\`
+
+**Option 2 (Using NodeSource repository for latest version):**
+\`\`\`bash
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+\`\`\`
+
+### Verify Node.js Installation:
+Open terminal/command prompt and run:
+\`\`\`bash
+node --version
+npm --version
+\`\`\`
+Both commands should return version numbers.
+
+## Quick Setup (After Node.js is installed)
+
+1. **Extract** this zip file to a folder on your computer
+2. **Open terminal/command prompt** in that folder:
+   - **Windows:** Right-click in the folder → "Open in Terminal" (Windows 11) or Shift+Right-click → "Open PowerShell window here"
+   - **macOS:** Right-click in Finder → "New Terminal at Folder" or drag folder to Terminal
+   - **Linux:** Right-click in file manager → "Open in Terminal"
+
+3. **Install dependencies:**
+   \`\`\`bash
+   npm install
+   \`\`\`
+
+4. **Install Playwright browser:**
+   \`\`\`bash
+   npx playwright install chromium
+   \`\`\`
+
+5. **Configure credentials:**
+   - Rename \`.env.example\` to \`.env\`
+   - Edit the \`.env\` file with your Meckano login details
+
+6. **Run the automation:**
+   \`\`\`bash
+   npm test
+   \`\`\`
 
 ## What's Included
 
-- package.json - Project dependencies
-- tsconfig.json - TypeScript configuration
-- playwright.config.ts - Playwright test configuration
-- tests/fill-hours.spec.ts - Main automation script
-- src/ - Utility modules (config, logger, time-utils)
-- .env.example - Environment variables template
-- README.md - Detailed documentation
+- **package.json** - Project dependencies
+- **tsconfig.json** - TypeScript configuration  
+- **playwright.config.ts** - Playwright test configuration
+- **tests/fill-hours.spec.ts** - Main automation script
+- **src/** - Utility modules (config, logger, time-utils)
+- **.env.example** - Environment variables template
+- **README.md** - Detailed documentation
+
+## Troubleshooting
+
+### "npm is not recognized" or "command not found"
+- Node.js/npm is not installed or not in PATH
+- Restart terminal/computer after installing Node.js
+- Try \`node --version\` first to verify installation
+
+### "Permission denied" errors (Linux/Mac)
+- Don't use \`sudo\` with npm commands
+- If needed, fix npm permissions: https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally
+
+### Playwright installation issues
+- Run: \`npx playwright install-deps\` (Linux)
+- Make sure you have enough disk space (browser downloads ~100MB)
+
+## Alternative: Use Git Clone
+
+If you prefer to use git (requires git installation):
+\`\`\`bash
+git clone https://github.com/mynameiseyal/meckano-fill.git
+cd meckano-fill
+npm install
+npx playwright install chromium
+\`\`\`
 
 ## Support
 
-If you need help, check the README.md file for detailed instructions and troubleshooting tips.
-
-## Note
-
-If some files are missing from this download, please use the git clone method:
-git clone https://github.com/mynameiseyal/meckano-fill.git
+For detailed help and troubleshooting, check the README.md file or visit the GitHub repository.
 `
 
     archive.append(installInstructions, { name: 'INSTALL.md' })
