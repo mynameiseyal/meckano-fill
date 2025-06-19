@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+
+# Testing
+test-results
+playwright-report
+playwright/.cache
+
+# Development
+.env.local
+.env.development.local
+
+# Build artifacts
+.next/cache
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Temporary files
+tmp
+temp 

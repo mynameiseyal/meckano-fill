@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://meckano-fill.vercel.app/sitemap.xml 
