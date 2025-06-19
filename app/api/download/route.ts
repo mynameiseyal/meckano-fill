@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 import { join, resolve, relative } from 'path'
 import archiver from 'archiver'
 
@@ -58,6 +58,73 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+// Fallback content for files that might not be available in serverless environment
+const fallbackContent: Record<string, string> = {
+  'tsconfig.json': `{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "ES6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}`,
+  'playwright.config.ts': `import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  use: {
+    baseURL: 'https://app.meckano.co.il',
+    trace: 'on-first-retry',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});`
+};
+
+function getFileContent(filePath: string, fileName: string): string | null {
+  try {
+    if (existsSync(filePath)) {
+      return readFileSync(filePath, 'utf8');
+    } else {
+      console.warn(`File not found: ${filePath}, using fallback if available`);
+      return fallbackContent[fileName] || null;
+    }
+  } catch (error) {
+    console.warn(`Error reading file ${filePath}:`, error instanceof Error ? error.message : 'Unknown error');
+    return fallbackContent[fileName] || null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Security: Rate limiting
@@ -68,6 +135,7 @@ export async function GET(request: NextRequest) {
         { status: 429 }
       );
     }
+    
     // Create a new archiver instance
     const archive = archiver('zip', {
       zlib: { level: 9 } // Maximum compression
@@ -84,6 +152,8 @@ export async function GET(request: NextRequest) {
       { source: 'src/time-utils.ts', destination: 'src/time-utils.ts' },
       { source: 'README.md', destination: 'README.md' }
     ]
+
+    let addedFiles = 0;
 
     // Add files to the archive with security validation
     for (const file of filesToInclude) {
@@ -104,12 +174,19 @@ export async function GET(request: NextRequest) {
           continue
         }
 
-        const fileContent = readFileSync(filePath, 'utf8')
-        archive.append(fileContent, { name: file.destination })
+        const fileContent = getFileContent(filePath, file.source);
+        if (fileContent) {
+          archive.append(fileContent, { name: file.destination })
+          addedFiles++;
+        } else {
+          console.warn(`Skipping file ${file.source}: no content available`)
+        }
       } catch (error) {
-        console.warn(`Could not read file ${file.source}:`, error instanceof Error ? error.message : 'Unknown error')
+        console.warn(`Could not process file ${file.source}:`, error instanceof Error ? error.message : 'Unknown error')
       }
     }
+
+    console.log(`Added ${addedFiles} files to archive`);
 
     // Add .env.example file with template content
     const envContent = `# Meckano Login Credentials
@@ -155,6 +232,11 @@ EXIT_END=18:00
 ## Support
 
 If you need help, check the README.md file for detailed instructions and troubleshooting tips.
+
+## Note
+
+If some files are missing from this download, please use the git clone method:
+git clone https://github.com/mynameiseyal/meckano-fill.git
 `
 
     archive.append(installInstructions, { name: 'INSTALL.md' })
