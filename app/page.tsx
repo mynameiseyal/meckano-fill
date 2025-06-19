@@ -7,6 +7,7 @@ export default function Home() {
 
   const downloadFiles = async () => {
     try {
+      console.log('Download button clicked'); // Debug log
       setDownloadStatus('Preparing zip file...')
       
       // Use fetch to get the file, then create blob URL
@@ -17,18 +18,23 @@ export default function Home() {
       }
       
       const blob = await response.blob()
+      console.log('Blob created, size:', blob.size); // Debug log
       const url = window.URL.createObjectURL(blob)
       
       // Create a link to download the blob
       const link = document.createElement('a')
       link.href = url
       link.download = 'meckano-fill.zip'
+      link.style.display = 'none'
       document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
       
-      // Clean up the blob URL
-      window.URL.revokeObjectURL(url)
+      // Force click with timeout to ensure it works
+      setTimeout(() => {
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+        console.log('Download triggered'); // Debug log
+      }, 100)
       
       setDownloadStatus('Download started! Check your downloads folder.')
     } catch (error) {
@@ -81,13 +87,27 @@ export default function Home() {
                 <h4 className="font-medium text-blue-900 mb-2">Method 2: Download Zip File</h4>
                 <button
                   onClick={downloadFiles}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+                  disabled={downloadStatus === 'Preparing zip file...'}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  Download meckano-fill.zip
+                  {downloadStatus === 'Preparing zip file...' ? 'Preparing...' : 'Download meckano-fill.zip'}
                 </button>
+                
+                {/* Fallback direct link */}
+                <div className="mt-2">
+                  <a 
+                    href="/api/download" 
+                    download="meckano-fill.zip"
+                    className="text-blue-600 hover:text-blue-800 underline text-sm"
+                  >
+                    Alternative: Direct download link
+                  </a>
+                </div>
+                
                 {downloadStatus && (
                   <p className="mt-2 text-sm text-blue-700">{downloadStatus}</p>
                 )}
