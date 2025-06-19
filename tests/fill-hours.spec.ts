@@ -69,14 +69,8 @@ async function clickAndFill(cell: Locator, value: string): Promise<FillResult> {
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        // Close any popups before attempting to interact with the cell
-        await closeAnyPopups(page);
-        
         await cell.click();
         await page.waitForTimeout(300);
-
-        // Close popups that might appear after clicking
-        await closeAnyPopups(page);
 
         // Clear existing content and type new value
         await page.keyboard.down('Control');
@@ -178,69 +172,7 @@ async function waitForNextRow(rows: Locator, currentIndex: number): Promise<void
   }
 }
 
-/**
- * Attempts to close any visible popups or modal dialogs
- */
-async function closeAnyPopups(page: Page): Promise<void> {
-  try {
-    // Try to close common modal/popup selectors
-    const popupSelectors = [
-      '[role="dialog"]',
-      '.modal',
-      '.popup',
-      '.overlay',
-      '[data-testid*="modal"]',
-      '[data-testid*="popup"]',
-      '[data-testid*="dialog"]',
-      '.swal2-container', // SweetAlert2
-      '.ui-dialog', // jQuery UI
-      '[class*="modal"]',
-      '[class*="popup"]'
-    ];
 
-    for (const selector of popupSelectors) {
-      const popup = page.locator(selector).first();
-      if (await popup.isVisible()) {
-        logger.info(`Closing popup with selector: ${selector}`);
-        
-        // Try to find and click close button
-        const closeSelectors = [
-          'button[aria-label="Close"]',
-          'button[aria-label="close"]',
-          '.close',
-          '[data-dismiss="modal"]',
-          '[data-testid*="close"]',
-          'button:has-text("×")',
-          'button:has-text("Close")',
-          'button:has-text("סגור")', // Hebrew "Close"
-          'button:has-text("בטל")'   // Hebrew "Cancel"
-        ];
-
-        let closed = false;
-        for (const closeSelector of closeSelectors) {
-          const closeBtn = popup.locator(closeSelector).first();
-          if (await closeBtn.isVisible()) {
-            await closeBtn.click();
-            logger.success(`Closed popup using: ${closeSelector}`);
-            closed = true;
-            break;
-          }
-        }
-
-        // If no close button found, try pressing Escape
-        if (!closed) {
-          await page.keyboard.press('Escape');
-          logger.info('Attempted to close popup with Escape key');
-        }
-
-        await page.waitForTimeout(500); // Wait for popup to close
-        break; // Only handle one popup at a time
-      }
-    }
-  } catch (error) {
-    logger.warn(`Error while trying to close popups: ${error}`);
-  }
-}
 
 test('fill meckano hours after login', async ({ page }: { page: Page }) => {
   logger.info('Starting Meckano hours filling automation');
@@ -261,17 +193,11 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     await page.goto(config.baseUrl);
     logger.info(`Navigated to ${config.baseUrl}`);
 
-    // Close any initial popups
-    await closeAnyPopups(page);
-
     // Fill login credentials
     await page.fill('#email', config.email);
     await page.fill('#password', config.password);
     await page.click('#submitButtons');
     logger.info('Login credentials submitted');
-
-    // Close any popups after login attempt
-    await closeAnyPopups(page);
 
     // Wait for login confirmation and navigation to dashboard
     logger.info('Waiting for confirmation code if needed...');
@@ -284,14 +210,17 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
       timeout: config.timeouts.navigation 
     });
     
-    // Close any popups before navigation
-    await closeAnyPopups(page);
-    
     await page.locator('a:has-text("דוח חודשי")').click();
     logger.info('Navigated to monthly report');
-
-    // Close any popups after navigation
-    await closeAnyPopups(page);
+    try {
+      await page.locator('#systemAlert-dialog a').first().click();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Click failed:', error.message);
+      } else {
+        console.error('Unknown error during click.');
+      }
+    }
 
     // Wait for table to load
     await page.getByRole('cell', { name: 'תאריך' }).locator('span').waitFor({ 
@@ -333,17 +262,11 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
       const timeEntry = generateTimeEntry(config.time);
       logger.info(`Row ${i}: Processing ${rowData.dateText} - Entrance=${timeEntry.entrance}, Exit=${timeEntry.exit}`);
 
-      // Close any popups before filling data
-      await closeAnyPopups(page);
-
       // Fill entrance time
       const entranceResult = await clickAndFill(rowData.entranceCell, timeEntry.entrance);
       if (!entranceResult.success) {
         logger.error(`Row ${i}: Failed to fill entrance time - ${entranceResult.error}`);
         errorRows++;
-        
-        // Try to close popups in case of error
-        await closeAnyPopups(page);
         continue;
       }
 
@@ -352,17 +275,11 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
       if (!exitResult.success) {
         logger.error(`Row ${i}: Failed to fill exit time - ${exitResult.error}`);
         errorRows++;
-        
-        // Try to close popups in case of error
-        await closeAnyPopups(page);
         continue;
       }
 
       processedRows++;
       logger.success(`Row ${i}: Successfully processed ${rowData.dateText}`);
-
-      // Close any popups that might have appeared after successful processing
-      await closeAnyPopups(page);
 
       // Wait before processing next row
       await page.waitForTimeout(1000);
