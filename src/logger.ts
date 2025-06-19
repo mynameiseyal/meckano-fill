@@ -32,8 +32,15 @@ class Logger {
     const levelName = LogLevel[level];
     const emoji = this.getLevelEmoji(level);
     
+    // In production, disable console logging for security
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
+    
     if (data) {
-      console.log(`${emoji} [${entry.timestamp}] ${levelName}: ${message}`, data);
+      // Sanitize data to prevent sensitive information logging
+      const sanitizedData = this.sanitizeData(data);
+      console.log(`${emoji} [${entry.timestamp}] ${levelName}: ${message}`, sanitizedData);
     } else {
       console.log(`${emoji} [${entry.timestamp}] ${levelName}: ${message}`);
     }
@@ -47,6 +54,37 @@ class Logger {
       case LogLevel.ERROR: return '❌';
       default: return '📝';
     }
+  }
+
+  private sanitizeData(data: any): any {
+    if (typeof data === 'string') {
+      // Check if string contains sensitive patterns
+      if (data.toLowerCase().includes('password') || 
+          data.toLowerCase().includes('token') || 
+          data.toLowerCase().includes('secret') ||
+          data.toLowerCase().includes('key')) {
+        return '[REDACTED]';
+      }
+      return data;
+    }
+    
+    if (typeof data === 'object' && data !== null) {
+      const sanitized: any = Array.isArray(data) ? [] : {};
+      for (const key in data) {
+        if (key.toLowerCase().includes('password') || 
+            key.toLowerCase().includes('token') || 
+            key.toLowerCase().includes('secret') ||
+            key.toLowerCase().includes('key') ||
+            key.toLowerCase().includes('auth')) {
+          sanitized[key] = '[REDACTED]';
+        } else {
+          sanitized[key] = this.sanitizeData(data[key]);
+        }
+      }
+      return sanitized;
+    }
+    
+    return data;
   }
 
   debug(message: string, data?: any): void {
@@ -66,11 +104,15 @@ class Logger {
   }
 
   success(message: string, data?: any): void {
-    console.log(`✅ [${new Date().toISOString()}] SUCCESS: ${message}`, data || '');
+    if (process.env.NODE_ENV === 'production') return;
+    const sanitizedData = data ? this.sanitizeData(data) : '';
+    console.log(`✅ [${new Date().toISOString()}] SUCCESS: ${message}`, sanitizedData);
   }
 
   skip(message: string, data?: any): void {
-    console.log(`🔄 [${new Date().toISOString()}] SKIP: ${message}`, data || '');
+    if (process.env.NODE_ENV === 'production') return;
+    const sanitizedData = data ? this.sanitizeData(data) : '';
+    console.log(`🔄 [${new Date().toISOString()}] SKIP: ${message}`, sanitizedData);
   }
 }
 

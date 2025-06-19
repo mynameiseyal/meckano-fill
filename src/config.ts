@@ -42,8 +42,8 @@ function getEnvNumber(name: string, defaultValue: number): number {
 }
 
 export const config: AppConfig = {
-  email: validateEnvVar('EMAIL', process.env.EMAIL),
-  password: validateEnvVar('PASSWORD', process.env.PASSWORD),
+  email: validateEnvVar('MECKANO_EMAIL', process.env.MECKANO_EMAIL),
+  password: validateEnvVar('MECKANO_PASSWORD', process.env.MECKANO_PASSWORD),
   baseUrl: 'https://app.meckano.co.il',
   timeouts: {
     login: 120000, // 2 minutes

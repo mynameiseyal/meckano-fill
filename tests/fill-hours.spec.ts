@@ -215,10 +215,13 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     try {
       await page.locator('#systemAlert-dialog a').first().click();
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Click failed:', error.message);
-      } else {
-        console.error('Unknown error during click.');
+      // Silently handle system alert dialog errors as they're not critical
+      if (process.env.NODE_ENV !== 'production') {
+        if (error instanceof Error) {
+          console.error('Click failed:', error.message);
+        } else {
+          console.error('Unknown error during click.');
+        }
       }
     }
 

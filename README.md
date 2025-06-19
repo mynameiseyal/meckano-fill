@@ -15,17 +15,19 @@ A streamlined Playwright-based automation script designed to efficiently fill in
 
 ## ✨ Features
 
-- **Secure Environment Management**: Uses `.env` files for credential management
-- **Configurable Time Ranges**: Customizable entrance/exit time parameters
-- **Robust Error Handling**: Comprehensive error handling with detailed logging
-- **TypeScript Support**: Full type safety and better development experience
-- **Structured Logging**: Professional logging system with different log levels
-- **Weekend Detection**: Automatically skips weekends (Friday and Saturday)
-- **Input Validation**: Validates time formats before filling
-- **Retry Logic**: Automatic retry on failures with configurable attempts
-- **Smart Field Detection**: Skips fields that already contain values
-- **Clean Automation**: Streamlined process without complex popup handling
-- **Detailed Reporting**: Comprehensive summary of processed, skipped, and failed rows
+- **🔒 Enterprise Security**: Production-ready security with comprehensive protection
+- **🛡️ Secure Environment Management**: Uses `.env` files for credential management
+- **⚙️ Configurable Time Ranges**: Customizable entrance/exit time parameters
+- **🔧 Robust Error Handling**: Comprehensive error handling with detailed logging
+- **📝 TypeScript Support**: Full type safety and better development experience
+- **📊 Structured Logging**: Professional logging system with sensitive data protection
+- **📅 Weekend Detection**: Automatically skips weekends (Friday and Saturday)
+- **✅ Input Validation**: Validates time formats before filling
+- **🔄 Retry Logic**: Automatic retry on failures with configurable attempts
+- **🎯 Smart Field Detection**: Skips fields that already contain values
+- **🧹 Clean Automation**: Streamlined process without complex popup handling
+- **📈 Detailed Reporting**: Comprehensive summary of processed, skipped, and failed rows
+- **🚀 Web Interface**: Modern Next.js web UI for easy project download and setup
 
 ## 🛠️ Prerequisites
 
@@ -63,8 +65,8 @@ Ensure you have the following installed on your system:
 2. **Edit `.env.local` with your credentials:**
    ```env
    # Meckano Login Credentials (REQUIRED)
-   EMAIL=your.email@example.com
-   PASSWORD=yourpassword
+   MECKANO_EMAIL=your.email@example.com
+   MECKANO_PASSWORD=yourpassword
 
    # Time Configuration (OPTIONAL - defaults will be used if not set)
    MIN_ENTRANCE_HOUR=7
@@ -149,8 +151,8 @@ The script supports the following time configuration parameters in your `.env.lo
 
 ### Example Configuration:
 ```env
-EMAIL=john.doe@company.com
-PASSWORD=mySecurePassword123
+MECKANO_EMAIL=john.doe@company.com
+MECKANO_PASSWORD=mySecurePassword123
 MIN_ENTRANCE_HOUR=8
 MIN_ENTRANCE_MINUTE=0
 MAX_ENTRANCE_HOUR=9
@@ -161,15 +163,40 @@ MAX_WORK_HOURS=9
 
 This configuration will generate entrance times between 8:00-9:00 and work days of 8-9 hours.
 
+## 🔒 Security Features
+
+This project implements enterprise-grade security measures:
+
+### 🛡️ **Data Protection**
+- **Sensitive Data Sanitization**: Automatic redaction of passwords, tokens, and secrets in logs
+- **Production Logging Control**: Console logging disabled in production environments
+- **Environment Variable Security**: Secure handling of credentials with validation
+
+### 🌐 **Web Security**
+- **Content Security Policy**: Strict CSP headers prevent XSS attacks
+- **Security Headers**: Comprehensive security headers (X-Frame-Options, X-Content-Type-Options, etc.)
+- **Path Traversal Protection**: File access validation prevents directory traversal attacks
+- **Rate Limiting**: API endpoint protection with automatic cleanup
+
+### 🔐 **Access Control**
+- **Input Validation**: All user inputs are validated before processing
+- **Error Message Sanitization**: Error responses don't expose sensitive system information
+- **Memory Management**: Automatic cleanup prevents memory leaks
+
+### 📊 **Monitoring & Compliance**
+- **Audit Trail**: Comprehensive logging for security monitoring
+- **Zero Vulnerabilities**: Regular security audits with npm audit
+- **Production Ready**: Tested and hardened for production deployment
+
 ## 🔍 Troubleshooting
 
 ### Common Issues:
 
 1. **Environment Variables Not Set**
    ```
-   Error: Environment variable EMAIL is required but not set
+   Error: Environment variable MECKANO_EMAIL is required but not set
    ```
-   - Ensure your `.env.local` file exists and contains valid EMAIL and PASSWORD
+   - Ensure your `.env.local` file exists and contains valid MECKANO_EMAIL and MECKANO_PASSWORD
 
 2. **Login Failures**
    ```

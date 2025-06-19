@@ -1,13 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFileSync } from 'fs'
-import { join } from 'path'
+import { join, resolve, relative } from 'path'
 import archiver from 'archiver'
-import { Readable } from 'stream'
 
 export const dynamic = 'force-dynamic'
 
+// Security: Define allowed files to prevent path traversal
+const ALLOWED_FILES = new Set([
+  'package.json',
+  'tsconfig.json', 
+  'playwright.config.ts',
+  'tests/fill-hours.spec.ts',
+  'src/config.ts',
+  'src/logger.ts',
+  'src/time-utils.ts',
+  'README.md'
+]);
+
+// Simple rate limiting (in production, use Redis or similar)
+const downloadAttempts = new Map<string, { count: number; lastAttempt: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_ATTEMPTS = 5; // 5 downloads per minute per IP
+const CLEANUP_INTERVAL = 300000; // 5 minutes
+
+// Cleanup old entries to prevent memory leak
+function cleanupOldEntries(): void {
+  const now = Date.now();
+  const ipsToDelete: string[] = [];
+  
+  downloadAttempts.forEach((data, ip) => {
+    if (now - data.lastAttempt > RATE_LIMIT_WINDOW * 2) {
+      ipsToDelete.push(ip);
+    }
+  });
+  
+  ipsToDelete.forEach(ip => downloadAttempts.delete(ip));
+}
+
+// Run cleanup periodically
+setInterval(cleanupOldEntries, CLEANUP_INTERVAL);
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const attempts = downloadAttempts.get(ip);
+  
+  if (!attempts || now - attempts.lastAttempt > RATE_LIMIT_WINDOW) {
+    downloadAttempts.set(ip, { count: 1, lastAttempt: now });
+    return true;
+  }
+  
+  if (attempts.count >= MAX_ATTEMPTS) {
+    return false;
+  }
+  
+  attempts.count++;
+  attempts.lastAttempt = now;
+  return true;
+}
+
 export async function GET(request: NextRequest) {
   try {
+    // Security: Rate limiting
+    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: 'Too many download attempts. Please try again later.' },
+        { status: 429 }
+      );
+    }
     // Create a new archiver instance
     const archive = archiver('zip', {
       zlib: { level: 9 } // Maximum compression
@@ -25,14 +85,29 @@ export async function GET(request: NextRequest) {
       { source: 'README.md', destination: 'README.md' }
     ]
 
-    // Add files to the archive
+    // Add files to the archive with security validation
     for (const file of filesToInclude) {
       try {
-        const filePath = join(process.cwd(), file.source)
+        // Security: Validate file is in allowed list
+        if (!ALLOWED_FILES.has(file.source)) {
+          console.warn(`File not in allowed list: ${file.source}`)
+          continue
+        }
+
+        const filePath = resolve(join(process.cwd(), file.source))
+        const projectRoot = resolve(process.cwd())
+        
+        // Security: Ensure file is within project directory (prevent path traversal)
+        const relativePath = relative(projectRoot, filePath)
+        if (relativePath.startsWith('..') || relativePath.includes('..')) {
+          console.warn(`Path traversal attempt detected: ${file.source}`)
+          continue
+        }
+
         const fileContent = readFileSync(filePath, 'utf8')
         archive.append(fileContent, { name: file.destination })
       } catch (error) {
-        console.warn(`Could not read file ${file.source}:`, error)
+        console.warn(`Could not read file ${file.source}:`, error instanceof Error ? error.message : 'Unknown error')
       }
     }
 
@@ -107,7 +182,8 @@ If you need help, check the README.md file for detailed instructions and trouble
       })
 
       archive.on('error', (error: Error) => {
-        console.error('Archive error:', error)
+        // Log error internally without exposing details
+        console.error('Archive creation failed:', error.message)
         reject(new NextResponse(
           JSON.stringify({ error: 'Failed to create zip file' }), 
           { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -116,7 +192,8 @@ If you need help, check the README.md file for detailed instructions and trouble
     })
 
   } catch (error) {
-    console.error('Error creating zip file:', error)
+    // Log error internally without exposing details
+    console.error('Zip creation error:', error instanceof Error ? error.message : 'Unknown error')
     return NextResponse.json({ error: 'Failed to create zip file' }, { status: 500 })
   }
 } 
