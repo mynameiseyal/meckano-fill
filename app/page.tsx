@@ -54,17 +54,6 @@ export default function Home() {
                   Download meckano-fill.zip
                 </a>
                 
-                {/* Fallback direct link */}
-                <div className="mt-2">
-                  <a 
-                    href="/api/download" 
-                    download="meckano-fill.zip"
-                    className="text-blue-600 hover:text-blue-800 underline text-sm"
-                  >
-                    Alternative: Direct download link
-                  </a>
-                </div>
-                
                 <p className="text-sm text-blue-700 mt-2">
                   📦 Contains all project files, dependencies, and setup instructions
                 </p>
