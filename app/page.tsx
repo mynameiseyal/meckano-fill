@@ -1,32 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-
 export default function Home() {
-  const [downloadStatus, setDownloadStatus] = useState<string>('')
-
-  const downloadFiles = async () => {
-    try {
-      console.log('Download button clicked'); // Debug log
-      setDownloadStatus('Preparing zip file...')
-      
-      // Create a simple download link and click it
-      const link = document.createElement('a');
-      link.href = '/api/download';
-      link.download = 'meckano-fill.zip';
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      console.log('Download triggered'); // Debug log
-      setDownloadStatus('Download started! Check your downloads folder.')
-    } catch (error) {
-      console.error('Download error:', error)
-      setDownloadStatus('Download failed. Please try again or use git clone method.')
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
@@ -69,17 +43,16 @@ export default function Home() {
               {/* Direct Download Method */}
               <div className="mb-4">
                 <h4 className="font-medium text-blue-900 mb-2">Method 2: Download Zip File</h4>
-                <button
-                  onClick={downloadFiles}
-                  type="button"
-                  disabled={downloadStatus === 'Preparing zip file...'}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
+                <a
+                  href="/api/download"
+                  download="meckano-fill.zip"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer inline-flex no-underline"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  {downloadStatus === 'Preparing zip file...' ? 'Preparing...' : 'Download meckano-fill.zip'}
-                </button>
+                  Download meckano-fill.zip
+                </a>
                 
                 {/* Fallback direct link */}
                 <div className="mt-2">
@@ -92,9 +65,6 @@ export default function Home() {
                   </a>
                 </div>
                 
-                {downloadStatus && (
-                  <p className="mt-2 text-sm text-blue-700">{downloadStatus}</p>
-                )}
                 <p className="text-sm text-blue-700 mt-2">
                   📦 Contains all project files, dependencies, and setup instructions
                 </p>
