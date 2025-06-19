@@ -6,7 +6,21 @@ export default function Home() {
   const [downloadStatus, setDownloadStatus] = useState<string>('')
 
   const downloadFiles = async () => {
-    setDownloadStatus('Individual file downloads available below. For complete setup, use git clone method.')
+    try {
+      setDownloadStatus('Preparing zip file...')
+      
+      // Create a link to download the zip file
+      const link = document.createElement('a')
+      link.href = '/api/download'
+      link.download = 'meckano-fill.zip'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      setDownloadStatus('Download started! Check your downloads folder.')
+    } catch (error) {
+      setDownloadStatus('Download failed. Please try again or use git clone method.')
+    }
   }
 
   return (
@@ -50,38 +64,21 @@ export default function Home() {
 
               {/* Direct Download Method */}
               <div className="mb-4">
-                <h4 className="font-medium text-blue-900 mb-2">Method 2: Individual File Downloads</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-                  <a href="/api/download?file=package.json" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    package.json
-                  </a>
-                  <a href="/api/download?file=tsconfig.json" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    tsconfig.json
-                  </a>
-                  <a href="/api/download?file=playwright.config.ts" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    playwright.config.ts
-                  </a>
-                  <a href="/api/download?file=fill-hours.spec.ts" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    fill-hours.spec.ts
-                  </a>
-                  <a href="/api/download?file=config.ts" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    config.ts
-                  </a>
-                  <a href="/api/download?file=logger.ts" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    logger.ts
-                  </a>
-                  <a href="/api/download?file=time-utils.ts" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    time-utils.ts
-                  </a>
-                  <a href="/api/download?file=.env.example" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    .env.example
-                  </a>
-                  <a href="/api/download?file=README.md" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm text-center transition-colors">
-                    README.md
-                  </a>
-                </div>
-                <p className="text-sm text-blue-700">
-                  💡 Tip: Right-click and "Save As" to download individual files, or use git clone for complete setup.
+                <h4 className="font-medium text-blue-900 mb-2">Method 2: Download Zip File</h4>
+                <button
+                  onClick={downloadFiles}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download meckano-fill.zip
+                </button>
+                {downloadStatus && (
+                  <p className="mt-2 text-sm text-blue-700">{downloadStatus}</p>
+                )}
+                <p className="text-sm text-blue-700 mt-2">
+                  📦 Contains all project files, dependencies, and setup instructions
                 </p>
               </div>
             </div>
@@ -90,13 +87,15 @@ export default function Home() {
             <div className="space-y-6">
               <div className="border-l-4 border-green-500 pl-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Step 1: Install Dependencies
+                  Step 1: Extract & Install Dependencies
                 </h3>
                 <div className="bg-gray-900 text-green-400 p-4 rounded-md font-mono text-sm overflow-x-auto mb-3">
+                  <div className="text-gray-400"># Extract the downloaded zip file</div>
+                  <div className="text-gray-400"># Open terminal in the extracted folder</div>
                   <div className="text-white">npm install</div>
                 </div>
                 <p className="text-gray-600">
-                  This installs Playwright and TypeScript dependencies needed for the automation.
+                  Extract the zip file to a folder, then install Playwright and TypeScript dependencies.
                 </p>
               </div>
 
@@ -117,9 +116,10 @@ export default function Home() {
                   Step 3: Configure Credentials
                 </h3>
                 <div className="mb-3">
-                  <p className="text-gray-600 mb-2">Create a <code className="bg-gray-100 px-2 py-1 rounded">.env</code> file with your Meckano credentials:</p>
+                  <p className="text-gray-600 mb-2">Rename <code className="bg-gray-100 px-2 py-1 rounded">.env.example</code> to <code className="bg-gray-100 px-2 py-1 rounded">.env</code> and add your credentials:</p>
                   <div className="bg-gray-900 text-green-400 p-4 rounded-md font-mono text-sm overflow-x-auto">
-                    <div className="text-gray-400"># Meckano Login Credentials</div>
+                    <div className="text-gray-400"># Rename .env.example to .env</div>
+                    <div className="text-gray-400"># Then edit with your details:</div>
                     <div className="text-white">MECKANO_EMAIL=your-email@example.com</div>
                     <div className="text-white">MECKANO_PASSWORD=your-password</div>
                     <div className="text-gray-400 mt-2"># Work Hours Configuration</div>
