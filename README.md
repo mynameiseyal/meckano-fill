@@ -31,29 +31,91 @@ A streamlined Playwright-based automation script designed to efficiently fill in
 
 ## 🛠️ Prerequisites
 
-Ensure you have the following installed on your system:
+### Install Node.js and npm
 
-- **Node.js** (version 16.x or higher)
-- **npm** (comes with Node.js)
+**You need Node.js (which includes npm) installed on your computer first.**
+
+#### Windows:
+1. Go to https://nodejs.org/
+2. Download the LTS version (recommended)
+3. Run the installer and follow the setup wizard
+4. Restart your computer after installation
+
+#### macOS:
+**Option 1 (Recommended):**
+1. Go to https://nodejs.org/
+2. Download the LTS version
+3. Run the .pkg installer
+
+**Option 2 (Using Homebrew):**
+```bash
+brew install node
+```
+
+#### Ubuntu/Linux:
+**Option 1 (Using package manager):**
+```bash
+# Update package index
+sudo apt update
+
+# Install Node.js and npm
+sudo apt install nodejs npm
+
+# Verify installation
+node --version
+npm --version
+```
+
+**Option 2 (Using NodeSource repository for latest version):**
+```bash
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+#### Verify Node.js Installation:
+Open terminal/command prompt and run:
+```bash
+node --version
+npm --version
+```
+Both commands should return version numbers.
+
+### Additional Requirements:
 - **Git** (for cloning the repository)
+- **Node.js** version 16.x or higher (included in installation above)
 
 ## 🚀 Installation
 
-1. **Clone the repository:**
+### Quick Start:
+
+1. **Open terminal/command prompt:**
+   - **Windows:** Right-click in folder → "Open in Terminal" (Windows 11) or Shift+Right-click → "Open PowerShell window here"
+   - **macOS:** Right-click in Finder → "New Terminal at Folder" or drag folder to Terminal
+   - **Linux:** Right-click in file manager → "Open in Terminal"
+
+2. **Clone the repository:**
    ```bash
    git clone https://github.com/mynameiseyal/meckano-fill.git
    cd meckano-fill
    ```
 
-2. **Install dependencies:**
+3. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Install Playwright browsers:**
+4. **Install Playwright browsers:**
    ```bash
-   npx playwright install
+   npx playwright install chromium
    ```
+
+### Alternative: Download from Web Interface
+
+You can also download a pre-configured package:
+1. Visit the project's web interface
+2. Click "Download Project"
+3. Extract the zip file
+4. Follow the installation instructions included in the download
 
 ## ⚙️ Configuration
 
@@ -190,33 +252,58 @@ This project implements enterprise-grade security measures:
 
 ## 🔍 Troubleshooting
 
-### Common Issues:
+### Node.js/npm Installation Issues:
 
-1. **Environment Variables Not Set**
+1. **"npm is not recognized" or "command not found"**
+   ```
+   'npm' is not recognized as an internal or external command
+   ```
+   - Node.js/npm is not installed or not in PATH
+   - Restart terminal/computer after installing Node.js
+   - Try `node --version` first to verify installation
+
+2. **"Permission denied" errors (Linux/Mac)**
+   ```
+   Error: EACCES: permission denied
+   ```
+   - Don't use `sudo` with npm commands
+   - If needed, fix npm permissions: https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally
+
+3. **Playwright installation issues**
+   ```
+   Error: Failed to download browser
+   ```
+   - Run: `npx playwright install-deps` (Linux)
+   - Make sure you have enough disk space (browser downloads ~100MB)
+   - Try: `npx playwright install chromium --force`
+
+### Application Issues:
+
+4. **Environment Variables Not Set**
    ```
    Error: Environment variable MECKANO_EMAIL is required but not set
    ```
    - Ensure your `.env.local` file exists and contains valid MECKANO_EMAIL and MECKANO_PASSWORD
 
-2. **Login Failures**
+5. **Login Failures**
    ```
    Error: page.waitForURL: Timeout exceeded
    ```
    - Verify your credentials are correct in `.env.local`
    - Check if the Meckano website is accessible
 
-3. **Element Not Found Errors**
+6. **Element Not Found Errors**
    ```
    Error: locator.waitFor: Timeout exceeded
    ```
    - The Meckano UI may have changed; selectors might need updating
    - Try running with `--headed` flag to see what's happening visually
 
-4. **Browser Installation Issues**
+7. **Browser Installation Issues**
    ```
    Error: Executable doesn't exist
    ```
-   - Run `npx playwright install` to download browsers
+   - Run `npx playwright install chromium` to download browsers
 
 ### Debug Mode:
 ```bash
