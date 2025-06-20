@@ -13,13 +13,13 @@ export default function DownloadPage() {
             </Link>
             <div className="hidden md:flex space-x-8">
               <Link href="/setup" className="text-white/90 hover:text-white transition-colors">
-                0: Environment Prep
+                Setup Guide
               </Link>
               <Link href="/download" className="text-white border-b-2 border-blue-400">
-                1: Script Assembler
+                Download the Project
               </Link>
               <Link href="/instructions" className="text-white/90 hover:text-white transition-colors">
-                2: Go Time
+                Running Instructions
               </Link>
             </div>
           </div>
@@ -183,6 +183,7 @@ export default function DownloadPage() {
                     </svg>
                     <code className="text-blue-300">src/</code> - Utility modules (config, logger, time-utils)
                   </li>
+
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

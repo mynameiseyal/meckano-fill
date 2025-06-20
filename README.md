@@ -119,6 +119,8 @@ You can also download a pre-configured package:
 
 ## ⚙️ Configuration
 
+### Manual Configuration
+
 1. **Create your `.env` file:**
    ```bash
    cp .env .env.local

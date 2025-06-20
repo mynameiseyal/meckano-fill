@@ -13,13 +13,13 @@ export default function SetupPage() {
             </Link>
             <div className="hidden md:flex space-x-8">
               <Link href="/setup" className="text-white border-b-2 border-blue-400">
-                0: Environment Prep
+                Setup Guide
               </Link>
               <Link href="/download" className="text-white/90 hover:text-white transition-colors">
-                1: Script Assembler
+                Download the Project
               </Link>
               <Link href="/instructions" className="text-white/90 hover:text-white transition-colors">
-                2: Go Time
+                Running Instructions
               </Link>
             </div>
           </div>
@@ -53,84 +53,63 @@ export default function SetupPage() {
             </div>
           </div>
 
-          {/* Windows Installation */}
+          {/* Operating System Installation Instructions */}
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 mb-8 border border-white/20">
-            <div className="flex items-center mb-6">
-              <span className="text-4xl mr-4">🪟</span>
-              <h2 className="text-3xl font-bold text-white">Windows</h2>
-            </div>
+            <h2 className="text-2xl font-bold text-white mb-6">Node.js Installation by Operating System</h2>
             
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Windows */}
               <div className="bg-black/20 rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Step-by-Step Installation:</h3>
-                <ol className="list-decimal list-inside space-y-3 text-white/90">
-                  <li>
-                    Visit <a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">https://nodejs.org/</a>
-                  </li>
-                  <li>Download the <strong>LTS version</strong> (Long Term Support - recommended)</li>
-                  <li>Run the downloaded <code className="bg-gray-700 px-2 py-1 rounded">.msi</code> installer</li>
-                  <li>Follow the installation wizard (accept all defaults)</li>
-                  <li><strong>Restart your computer</strong> after installation</li>
-                </ol>
-              </div>
-            </div>
-          </div>
-
-          {/* macOS Installation */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 mb-8 border border-white/20">
-            <div className="flex items-center mb-6">
-              <span className="text-4xl mr-4">🍎</span>
-              <h2 className="text-3xl font-bold text-white">macOS</h2>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Option 1 */}
-              <div className="bg-black/20 rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Option 1: Direct Download</h3>
-                <ol className="list-decimal list-inside space-y-2 text-white/90">
-                  <li>Visit <a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">https://nodejs.org/</a></li>
-                  <li>Download the LTS version</li>
-                  <li>Run the <code className="bg-gray-700 px-2 py-1 rounded">.pkg</code> installer</li>
-                  <li>Follow the installation prompts</li>
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">🪟</span>
+                  <h3 className="text-xl font-bold text-white">Windows</h3>
+                </div>
+                <ol className="list-decimal list-inside space-y-2 text-white/90 text-sm">
+                  <li>Visit <a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">nodejs.org</a></li>
+                  <li>Download <strong>LTS version</strong></li>
+                  <li>Run the <code className="bg-gray-700 px-1 py-0.5 rounded text-xs">.msi</code> installer</li>
+                  <li>Follow installation wizard</li>
+                  <li><strong>Restart computer</strong></li>
                 </ol>
               </div>
 
-              {/* Option 2 */}
+              {/* macOS */}
               <div className="bg-black/20 rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Option 2: Homebrew</h3>
-                <p className="text-white/70 mb-3">If you have Homebrew installed:</p>
-                <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm">
-                  <span className="text-white">brew install node</span>
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">🍎</span>
+                  <h3 className="text-xl font-bold text-white">macOS</h3>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Linux Installation */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 mb-8 border border-white/20">
-            <div className="flex items-center mb-6">
-              <span className="text-4xl mr-4">🐧</span>
-              <h2 className="text-3xl font-bold text-white">Ubuntu/Linux</h2>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Option 1 */}
-              <div className="bg-black/20 rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Option 1: Package Manager</h3>
-                <div className="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm space-y-2">
-                  <div className="text-gray-400"># Update package index</div>
-                  <div className="text-white">sudo apt update</div>
-                  <div className="text-gray-400"># Install Node.js and npm</div>
-                  <div className="text-white">sudo apt install nodejs npm</div>
+                <div className="text-sm">
+                  <p className="text-white/90 font-medium mb-2">Option 1: Direct Download</p>
+                  <ol className="list-decimal list-inside space-y-1 text-white/80 mb-3">
+                    <li>Visit <a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">nodejs.org</a></li>
+                    <li>Download LTS version</li>
+                    <li>Run <code className="bg-gray-700 px-1 py-0.5 rounded text-xs">.pkg</code> installer</li>
+                  </ol>
+                  <p className="text-white/90 font-medium mb-2">Option 2: Homebrew</p>
+                  <div className="bg-gray-900 text-green-400 p-2 rounded font-mono text-xs">
+                    <span className="text-white">brew install node</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Option 2 */}
+              {/* Linux */}
               <div className="bg-black/20 rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Option 2: Latest Version</h3>
-                <div className="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm space-y-2">
-                  <div className="text-white text-xs">curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -</div>
-                  <div className="text-white">sudo apt-get install -y nodejs</div>
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">🐧</span>
+                  <h3 className="text-xl font-bold text-white">Ubuntu/Linux</h3>
+                </div>
+                <div className="text-sm">
+                  <p className="text-white/90 font-medium mb-2">Package Manager:</p>
+                  <div className="bg-gray-900 text-green-400 p-2 rounded font-mono text-xs mb-3 space-y-1">
+                    <div className="text-white">sudo apt update</div>
+                    <div className="text-white">sudo apt install nodejs npm</div>
+                  </div>
+                  <p className="text-white/90 font-medium mb-2">Latest Version:</p>
+                  <div className="bg-gray-900 text-green-400 p-2 rounded font-mono text-xs space-y-1">
+                    <div className="text-white text-xs">curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -</div>
+                    <div className="text-white">sudo apt-get install -y nodejs</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -168,49 +147,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          {/* Terminal Instructions */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 mb-8 border border-white/20">
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">How to Open Terminal/Command Prompt</h2>
-                <p className="text-white/70">Different methods for each operating system</p>
-              </div>
-            </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-black/20 rounded-lg p-4">
-                <h4 className="font-semibold text-white mb-2">🪟 Windows</h4>
-                <ul className="text-white/80 text-sm space-y-1">
-                  <li>• Right-click in folder → "Open in Terminal"</li>
-                  <li>• Or Shift+Right-click → "Open PowerShell"</li>
-                  <li>• Or Press Win+R, type 'cmd', hit Enter</li>
-                </ul>
-              </div>
-              
-              <div className="bg-black/20 rounded-lg p-4">
-                <h4 className="font-semibold text-white mb-2">🍎 macOS</h4>
-                <ul className="text-white/80 text-sm space-y-1">
-                  <li>• Right-click in Finder → "New Terminal at Folder"</li>
-                  <li>• Drag folder to Terminal app</li>
-                  <li>• Press Cmd+Space, type 'Terminal'</li>
-                </ul>
-              </div>
-              
-              <div className="bg-black/20 rounded-lg p-4">
-                <h4 className="font-semibold text-white mb-2">🐧 Linux</h4>
-                <ul className="text-white/80 text-sm space-y-1">
-                  <li>• Right-click in file manager → "Open in Terminal"</li>
-                  <li>• Press Ctrl+Alt+T</li>
-                  <li>• Or search for "Terminal" in applications</li>
-                </ul>
-              </div>
-            </div>
-          </div>
 
           {/* Next Steps */}
           <div className="text-center">

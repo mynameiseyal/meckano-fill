@@ -13,13 +13,13 @@ export default function InstructionsPage() {
             </Link>
             <div className="hidden md:flex space-x-8">
               <Link href="/setup" className="text-white/90 hover:text-white transition-colors">
-                0: Environment Prep
+                Setup Guide
               </Link>
               <Link href="/download" className="text-white/90 hover:text-white transition-colors">
-                1: Script Assembler
+                Download the Project
               </Link>
               <Link href="/instructions" className="text-white border-b-2 border-blue-400">
-                2: Go Time
+                Running Instructions
               </Link>
             </div>
           </div>
@@ -254,59 +254,7 @@ export default function InstructionsPage() {
             </div>
           </div>
 
-          {/* Troubleshooting */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 mb-8 border border-white/20">
-            <h2 className="text-2xl font-bold text-white mb-6">🛠️ Troubleshooting</h2>
-            
-            <div className="space-y-6">
-              <div className="bg-black/20 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-red-400 mb-3">❌ Common Issues</h3>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium text-white mb-1">"npm is not recognized"</h4>
-                    <p className="text-white/70 text-sm">Node.js/npm not installed. Go back to <Link href="/setup" className="text-blue-400 underline">Setup Guide</Link>.</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium text-white mb-1">"Environment variable MECKANO_EMAIL is required"</h4>
-                    <p className="text-white/70 text-sm">Check your .env file exists and contains your credentials.</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium text-white mb-1">"Login timeout" or "2FA required"</h4>
-                    <p className="text-white/70 text-sm">Complete 2FA authentication when prompted, or check your credentials.</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium text-white mb-1">"Browser executable not found"</h4>
-                    <p className="text-white/70 text-sm">Run: <code className="bg-gray-700 px-2 py-1 rounded text-green-400">npx playwright install chromium</code></p>
-                  </div>
-                </div>
-              </div>
 
-              <div className="bg-black/20 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-green-400 mb-3">💡 Pro Tips</h3>
-                <ul className="space-y-2 text-white/80 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-green-400 mr-2">•</span>
-                    Run in headed mode first time to see what's happening
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-green-400 mr-2">•</span>
-                    The script only fills empty entries - your existing data is safe
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-green-400 mr-2">•</span>
-                    You can run it multiple times - it won't duplicate entries
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-green-400 mr-2">•</span>
-                    Customize work hours in your .env file for different patterns
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
 
           {/* Success */}
           <div className="text-center">
