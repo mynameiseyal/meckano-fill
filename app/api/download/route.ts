@@ -447,7 +447,254 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     logger.error(\`Automation failed: \${error}\`);
     throw error;
   }
-});`
+});`,
+  'src/config.ts': `import * as dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
+export interface TimeConfig {
+  minEntranceHour: number;
+  minEntranceMinute: number;
+  maxEntranceHour: number;
+  maxEntranceMinute: number;
+  minWorkHours: number;
+  maxWorkHours: number;
+}
+
+export interface AppConfig {
+  email: string;
+  password: string;
+  baseUrl: string;
+  timeouts: {
+    login: number;
+    navigation: number;
+    element: number;
+  };
+  time: TimeConfig;
+}
+
+function validateEnvVar(name: string, value: string | undefined): string {
+  if (!value || value.trim() === '') {
+    throw new Error(\`Environment variable \${name} is required but not set\`);
+  }
+  return value.trim();
+}
+
+function getEnvNumber(name: string, defaultValue: number): number {
+  const value = process.env[name];
+  if (!value) return defaultValue;
+  const num = parseInt(value, 10);
+  if (isNaN(num)) {
+    throw new Error(\`Environment variable \${name} must be a valid number, got: \${value}\`);
+  }
+  return num;
+}
+
+function createConfig(): AppConfig {
+  return {
+    email: validateEnvVar('MECKANO_EMAIL', process.env.MECKANO_EMAIL),
+    password: validateEnvVar('MECKANO_PASSWORD', process.env.MECKANO_PASSWORD),
+    baseUrl: 'https://app.meckano.co.il',
+    timeouts: {
+      login: 120000, // 2 minutes
+      navigation: 20000, // 20 seconds
+      element: 15000, // 15 seconds
+    },
+    time: {
+      minEntranceHour: getEnvNumber('MIN_ENTRANCE_HOUR', 7),
+      minEntranceMinute: getEnvNumber('MIN_ENTRANCE_MINUTE', 45),
+      maxEntranceHour: getEnvNumber('MAX_ENTRANCE_HOUR', 9),
+      maxEntranceMinute: getEnvNumber('MAX_ENTRANCE_MINUTE', 30),
+      minWorkHours: getEnvNumber('MIN_WORK_HOURS', 9),
+      maxWorkHours: getEnvNumber('MAX_WORK_HOURS', 10),
+    },
+  };
+}
+
+let _config: AppConfig | null = null;
+
+export const config: AppConfig = new Proxy({} as AppConfig, {
+  get(target, prop) {
+    if (!_config) {
+      _config = createConfig();
+    }
+    return _config[prop as keyof AppConfig];
+  }
+});`,
+  'src/logger.ts': `export enum LogLevel {
+  DEBUG = 0,
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3,
+}
+
+export interface LogEntry {
+  timestamp: string;
+  level: LogLevel;
+  message: string;
+  data?: any;
+}
+
+class Logger {
+  private logLevel: LogLevel = LogLevel.INFO;
+
+  setLogLevel(level: LogLevel): void {
+    this.logLevel = level;
+  }
+
+  private log(level: LogLevel, message: string, data?: any): void {
+    if (level < this.logLevel) return;
+
+    const entry: LogEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      data,
+    };
+
+    const levelName = LogLevel[level];
+    const emoji = this.getLevelEmoji(level);
+    
+    // In production, disable console logging for security
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
+    
+    if (data) {
+      // Sanitize data to prevent sensitive information logging
+      const sanitizedData = this.sanitizeData(data);
+      console.log(\`\${emoji} [\${entry.timestamp}] \${levelName}: \${message}\`, sanitizedData);
+    } else {
+      console.log(\`\${emoji} [\${entry.timestamp}] \${levelName}: \${message}\`);
+    }
+  }
+
+  private getLevelEmoji(level: LogLevel): string {
+    switch (level) {
+      case LogLevel.DEBUG: return '🔍';
+      case LogLevel.INFO: return 'ℹ️';
+      case LogLevel.WARN: return '⚠️';
+      case LogLevel.ERROR: return '❌';
+      default: return '📝';
+    }
+  }
+
+  private sanitizeData(data: any): any {
+    if (typeof data === 'string') {
+      // Check if string contains sensitive patterns
+      if (data.toLowerCase().includes('password') || 
+          data.toLowerCase().includes('token') || 
+          data.toLowerCase().includes('secret') ||
+          data.toLowerCase().includes('key')) {
+        return '[REDACTED]';
+      }
+      return data;
+    }
+    
+    if (typeof data === 'object' && data !== null) {
+      const sanitized: any = Array.isArray(data) ? [] : {};
+      for (const key in data) {
+        if (key.toLowerCase().includes('password') || 
+            key.toLowerCase().includes('token') || 
+            key.toLowerCase().includes('secret') ||
+            key.toLowerCase().includes('key') ||
+            key.toLowerCase().includes('auth')) {
+          sanitized[key] = '[REDACTED]';
+        } else {
+          sanitized[key] = this.sanitizeData(data[key]);
+        }
+      }
+      return sanitized;
+    }
+    
+    return data;
+  }
+
+  debug(message: string, data?: any): void {
+    this.log(LogLevel.DEBUG, message, data);
+  }
+
+  info(message: string, data?: any): void {
+    this.log(LogLevel.INFO, message, data);
+  }
+
+  warn(message: string, data?: any): void {
+    this.log(LogLevel.WARN, message, data);
+  }
+
+  error(message: string, data?: any): void {
+    this.log(LogLevel.ERROR, message, data);
+  }
+
+  success(message: string, data?: any): void {
+    if (process.env.NODE_ENV === 'production') return;
+    const sanitizedData = data ? this.sanitizeData(data) : '';
+    console.log(\`✅ [\${new Date().toISOString()}] SUCCESS: \${message}\`, sanitizedData);
+  }
+
+  skip(message: string, data?: any): void {
+    if (process.env.NODE_ENV === 'production') return;
+    const sanitizedData = data ? this.sanitizeData(data) : '';
+    console.log(\`🔄 [\${new Date().toISOString()}] SKIP: \${message}\`, sanitizedData);
+  }
+}
+
+export const logger = new Logger();`,
+  'src/time-utils.ts': `import { TimeConfig } from './config';
+
+export interface TimeEntry {
+  entrance: string;
+  exit: string;
+}
+
+/**
+ * Generates a random entrance time based on configuration
+ */
+export function getRandomEntranceTime(timeConfig: TimeConfig): string {
+  const startMinutes = timeConfig.minEntranceHour * 60 + timeConfig.minEntranceMinute;
+  const endMinutes = timeConfig.maxEntranceHour * 60 + timeConfig.maxEntranceMinute;
+  const randomMinutes = startMinutes + Math.floor(Math.random() * (endMinutes - startMinutes));
+
+  const hours = Math.floor(randomMinutes / 60);
+  const minutes = randomMinutes % 60;
+  return \`\${hours.toString().padStart(2, '0')}:\${minutes.toString().padStart(2, '0')}\`;
+}
+
+/**
+ * Calculates exit time based on entrance time and work hours configuration
+ */
+export function getExitTime(entrance: string, timeConfig: TimeConfig): string {
+  const [hours, minutes] = entrance.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+
+  // Add random number of minutes between min and max work hours
+  const minMinutes = timeConfig.minWorkHours * 60;
+  const maxMinutes = timeConfig.maxWorkHours * 60;
+  const extraMinutes = minMinutes + Math.floor(Math.random() * (maxMinutes - minMinutes + 1));
+  
+  date.setMinutes(date.getMinutes() + extraMinutes);
+
+  return date.toTimeString().slice(0, 5);
+}
+
+/**
+ * Generates a complete time entry (entrance and exit)
+ */
+export function generateTimeEntry(timeConfig: TimeConfig): TimeEntry {
+  const entrance = getRandomEntranceTime(timeConfig);
+  const exit = getExitTime(entrance, timeConfig);
+  return { entrance, exit };
+}
+
+/**
+ * Validates time format (HH:MM)
+ */
+export function isValidTimeFormat(time: string): boolean {
+  const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+  return timeRegex.test(time);
+}`
 };
 
 function getFileContent(filePath: string, fileName: string): string | null {
