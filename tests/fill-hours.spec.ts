@@ -161,17 +161,32 @@ async function waitForNextRow(rows: Locator, currentIndex: number): Promise<void
   const nextIndex = currentIndex + 1;
   const totalRows = await rows.count();
 
-  if (nextIndex < totalRows) {
-    try {
-      const nextEntranceCell = rows.nth(nextIndex).locator('td').nth(2);
-      logger.info(`Waiting for Row ${nextIndex} entrance cell to be ready...`);
-      // Reduced timeout to prevent blocking the main test
-      await nextEntranceCell.waitFor({ state: 'visible', timeout: 2000 });
-      await nextEntranceCell.page().waitForTimeout(200);
-    } catch (error) {
-      logger.warn(`Row ${nextIndex} not ready: ${error}`);
-      // Don't block the test if next row isn't ready
+  if (nextIndex >= totalRows) {
+    logger.debug(`No more rows to wait for (${nextIndex} >= ${totalRows})`);
+    return;
+  }
+
+  try {
+    // First check if the next row has enough cells
+    const nextRow = rows.nth(nextIndex);
+    const nextRowCells = nextRow.locator('td');
+    const cellCount = await nextRowCells.count();
+    
+    if (cellCount < 4) {
+      logger.debug(`Row ${nextIndex} has insufficient cells (${cellCount}), skipping wait`);
+      return;
     }
+
+    const nextEntranceCell = nextRowCells.nth(2);
+    logger.debug(`Waiting for Row ${nextIndex} entrance cell to be ready...`);
+    
+    // Reduced timeout and better error handling
+    await nextEntranceCell.waitFor({ state: 'visible', timeout: 1000 });
+    await nextEntranceCell.page().waitForTimeout(100);
+    
+  } catch (error) {
+    logger.debug(`Row ${nextIndex} not ready, continuing anyway: ${error}`);
+    // Don't block the test if next row isn't ready - this is not critical
   }
 }
 
@@ -302,13 +317,14 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
 
     // Process each row
     for (let i = 0; i < rowCount; i++) {
-      const row = rows.nth(i);
-      const rowData = await extractRowData(row, i);
+      try {
+        const row = rows.nth(i);
+        const rowData = await extractRowData(row, i);
 
-      if (!rowData) {
-        skippedRows++;
-        continue;
-      }
+        if (!rowData) {
+          skippedRows++;
+          continue;
+        }
 
       if (rowData.isWeekend) {
         logger.skip(`Row ${i}: ${rowData.dateText} is Friday or Saturday, skipping.`);
@@ -359,6 +375,12 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
         // Reduce wait time for better performance
         await page.waitForTimeout(500);
         await waitForNextRow(rows, i);
+      }
+      
+      } catch (error) {
+        logger.error(`Error processing row ${i}: ${error}`);
+        errorRows++;
+        // Continue with next row instead of failing the entire test
       }
     }
 
