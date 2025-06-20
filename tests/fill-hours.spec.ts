@@ -196,6 +196,9 @@ async function closeSystemAlertDialog(page: Page): Promise<void> {
 
 
 test('fill meckano hours after login', async ({ page }: { page: Page }) => {
+  // Set a longer timeout for this test (15 minutes)
+  test.setTimeout(15 * 60 * 1000);
+  
   logger.info('Starting Meckano hours filling automation');
   
   // Setup popup handlers to automatically close any popups
@@ -335,12 +338,11 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
       processedRows++;
       logger.success(`Row ${i}: Successfully processed ${rowData.dateText}`);
 
-      // Wait before processing next row
-      await page.waitForTimeout(1000);
-      
-      // Only wait for next row if we're not at the last row
+      // Only wait between rows if we're not at the last row and we actually processed something
       if (i < rowCount - 1) {
-      await waitForNextRow(rows, i);
+        // Reduce wait time for better performance
+        await page.waitForTimeout(500);
+        await waitForNextRow(rows, i);
       }
     }
 
