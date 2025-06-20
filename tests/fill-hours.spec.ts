@@ -180,7 +180,7 @@ async function waitForNextRow(rows: Locator, currentIndex: number): Promise<void
  */
 async function closeSystemAlertDialog(page: Page): Promise<void> {
   try {
-    await page.locator('#systemAlert-dialog a').first().click();
+    await page.locator('#systemAlert-dialog a').first().click({ timeout: 2000 });
     logger.info('Closed system alert dialog');
   } catch (error: unknown) {
     // Silently handle system alert dialog errors as they're not critical
@@ -278,7 +278,6 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     
     // Close any system alert dialogs after navigation
     await closeSystemAlertDialog(page);
-   
 
     // Wait for table to load
     await page.getByRole('cell', { name: 'תאריך' }).locator('span').waitFor({ 
