@@ -283,6 +283,8 @@ async function waitForNextRow(rows: Locator, currentIndex: number): Promise<void
   }
 }
 
+
+
 test('fill meckano hours after login', async ({ page }: { page: Page }) => {
   logger.info('Starting Meckano hours filling automation');
   
@@ -305,8 +307,43 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     // Fill login credentials
     await page.fill('#email', config.email);
     await page.fill('#password', config.password);
-    await page.click('#submitButtons');
-    logger.info('Login credentials submitted');
+    
+    // Wait for submit button to be clickable and click it with retry logic
+    logger.info('Attempting to click submit button...');
+    let loginAttempts = 0;
+    const maxLoginAttempts = 3;
+    
+    while (loginAttempts < maxLoginAttempts) {
+      try {
+        // Wait for button to be visible and enabled
+        await page.waitForSelector('#submitButtons', { state: 'visible', timeout: 10000 });
+        await page.waitForTimeout(500); // Small delay to ensure button is fully ready
+        
+        // Ensure button is enabled before clicking
+        const isEnabled = await page.isEnabled('#submitButtons');
+        if (!isEnabled) {
+          logger.warn(\`Submit button is disabled, waiting...\`);
+          await page.waitForTimeout(1000);
+          loginAttempts++;
+          continue;
+        }
+        
+        // Click the button
+        await page.click('#submitButtons');
+        logger.info('Login credentials submitted');
+        break;
+        
+      } catch (error) {
+        loginAttempts++;
+        logger.warn(\`Login attempt \${loginAttempts} failed: \${error}\`);
+        
+        if (loginAttempts >= maxLoginAttempts) {
+          throw new Error(\`Failed to click submit button after \${maxLoginAttempts} attempts: \${error}\`);
+        }
+        
+        await page.waitForTimeout(1000);
+      }
+    }
 
     // Wait for login confirmation and navigation to dashboard
     logger.info('Waiting for confirmation code if needed...');

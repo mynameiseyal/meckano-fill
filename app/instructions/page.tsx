@@ -13,13 +13,13 @@ export default function InstructionsPage() {
             </Link>
             <div className="hidden md:flex space-x-8">
               <Link href="/setup" className="text-white/90 hover:text-white transition-colors">
-                Setup Guide
+                0: Environment Prep
               </Link>
               <Link href="/download" className="text-white/90 hover:text-white transition-colors">
-                Download
+                1: Script Assembler
               </Link>
               <Link href="/instructions" className="text-white border-b-2 border-blue-400">
-                Instructions
+                2: Go Time
               </Link>
             </div>
           </div>
