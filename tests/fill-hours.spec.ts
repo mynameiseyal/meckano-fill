@@ -15,6 +15,7 @@ interface FillResult {
   success: boolean;
   value?: string;
   error?: string;
+  wasAlreadyFilled?: boolean; // Indicates if field was skipped because it already had a value
 }
 
 /**
@@ -46,7 +47,7 @@ async function clickAndFill(cell: Locator, value: string): Promise<FillResult> {
 
       if (currentValue) {
         logger.skip(`Field already contains "${currentValue}"`);
-        return { success: true, value: currentValue };
+        return { success: true, value: currentValue, wasAlreadyFilled: true };
       }
     } else {
       // No input at all, fall back to checking span
@@ -55,7 +56,7 @@ async function clickAndFill(cell: Locator, value: string): Promise<FillResult> {
 
       if (spanText) {
         logger.skip(`Field already contains "${spanText}"`);
-        return { success: true, value: spanText };
+        return { success: true, value: spanText, wasAlreadyFilled: true };
       }
     }
 
@@ -94,7 +95,7 @@ async function clickAndFill(cell: Locator, value: string): Promise<FillResult> {
 
         if (newText.includes(value)) {
           logger.success(`Filled "${value}" successfully on attempt ${attempt}`);
-          return { success: true, value: newText };
+          return { success: true, value: newText, wasAlreadyFilled: false };
         } else {
           logger.warn(`Validation failed: Expected "${value}", got "${newText}". Retrying...`);
         }
@@ -298,6 +299,7 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     let processedRows = 0;
     let skippedRows = 0;
     let errorRows = 0;
+    let actuallyFilledRows = 0; // Track rows where we actually filled data
 
     // Process each row
     for (let i = 0; i < rowCount; i++) {
@@ -319,12 +321,19 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
       const timeEntry = generateTimeEntry(config.time);
       logger.info(`Row ${i}: Processing ${rowData.dateText} - Entrance=${timeEntry.entrance}, Exit=${timeEntry.exit}`);
 
+      let rowHadWork = false; // Track if this row needed any actual filling
+
       // Fill entrance time
       const entranceResult = await clickAndFill(rowData.entranceCell, timeEntry.entrance);
       if (!entranceResult.success) {
         logger.error(`Row ${i}: Failed to fill entrance time - ${entranceResult.error}`);
         errorRows++;
         continue;
+      }
+      
+      // Check if entrance was actually filled (not just skipped)
+      if (!entranceResult.wasAlreadyFilled) {
+        rowHadWork = true;
       }
 
       // Fill exit time
@@ -334,22 +343,36 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
         errorRows++;
         continue;
       }
+      
+      // Check if exit was actually filled (not just skipped)
+      if (!exitResult.wasAlreadyFilled) {
+        rowHadWork = true;
+      }
 
       processedRows++;
+      if (rowHadWork) {
+        actuallyFilledRows++;
+      }
       logger.success(`Row ${i}: Successfully processed ${rowData.dateText}`);
 
-      // Only wait between rows if we're not at the last row and we actually processed something
-      if (i < rowCount - 1) {
+      // Only wait between rows if we're not at the last row AND we actually did some work
+      if (i < rowCount - 1 && rowHadWork) {
         // Reduce wait time for better performance
         await page.waitForTimeout(500);
         await waitForNextRow(rows, i);
       }
     }
 
+    // Check if no actual work was done
+    if (actuallyFilledRows === 0) {
+      logger.success('All timesheet entries are already filled - no updates needed!');
+    }
+
     // Log summary
     logger.info('Automation completed', {
       totalRows: rowCount,
       processedRows,
+      actuallyFilledRows,
       skippedRows,
       errorRows,
     });
