@@ -195,7 +195,7 @@ async function waitForNextRow(rows: Locator, currentIndex: number): Promise<void
  */
 async function closeSystemAlertDialog(page: Page): Promise<void> {
   try {
-    await page.locator('#systemAlert-dialog a').first().click({ timeout: 2000 });
+    await page.locator('#systemAlert-dialog a').first().click({ timeout: 3000 });
     logger.info('Closed system alert dialog');
   } catch (error: unknown) {
     // Silently handle system alert dialog errors as they're not critical
