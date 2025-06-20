@@ -164,10 +164,12 @@ async function waitForNextRow(rows: Locator, currentIndex: number): Promise<void
     try {
       const nextEntranceCell = rows.nth(nextIndex).locator('td').nth(2);
       logger.info(`Waiting for Row ${nextIndex} entrance cell to be ready...`);
-      await nextEntranceCell.waitFor({ state: 'visible', timeout: 5000 });
-      await nextEntranceCell.page().waitForTimeout(300);
+      // Reduced timeout to prevent blocking the main test
+      await nextEntranceCell.waitFor({ state: 'visible', timeout: 2000 });
+      await nextEntranceCell.page().waitForTimeout(200);
     } catch (error) {
       logger.warn(`Row ${nextIndex} not ready: ${error}`);
+      // Don't block the test if next row isn't ready
     }
   }
 }
@@ -322,7 +324,11 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
 
       // Wait before processing next row
       await page.waitForTimeout(1000);
-      await waitForNextRow(rows, i);
+      
+      // Only wait for next row if we're not at the last row
+      if (i < rowCount - 1) {
+        await waitForNextRow(rows, i);
+      }
     }
 
     // Log summary
