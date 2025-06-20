@@ -149,14 +149,22 @@ You can also download a pre-configured package:
 ## 🧪 Usage
 
 ### Run the automation:
+
+**🔍 Recommended: Run with browser UI visible (headed mode):**
 ```bash
 npx playwright test tests/fill-hours.spec.ts --headed
 ```
+*\*Best for typing the activation code if prompted*
 
-### Available Commands:
-- `npx playwright test tests/fill-hours.spec.ts` - Run in headless mode
-- `npx playwright test tests/fill-hours.spec.ts --headed` - Run with browser UI visible
-- `npx playwright test tests/fill-hours.spec.ts --debug` - Run in debug mode
+**Why headed mode is recommended:**
+- **Authentication codes**: If Meckano requests a verification code (SMS/email), you can enter it manually
+- **Visual monitoring**: See exactly what the automation is doing in real-time
+- **Troubleshooting**: Easily identify any issues or unexpected behavior
+- **First-time setup**: Verify the automation works correctly before running headless
+
+**Alternative Commands:**
+- `npx playwright test tests/fill-hours.spec.ts` - Run in headless mode (no browser UI)
+- `npx playwright test tests/fill-hours.spec.ts --debug` - Run in debug mode with step-by-step control
 
 ### What the script does:
 

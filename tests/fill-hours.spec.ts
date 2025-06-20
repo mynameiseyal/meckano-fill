@@ -174,6 +174,25 @@ async function waitForNextRow(rows: Locator, currentIndex: number): Promise<void
   }
 }
 
+/**
+ * Attempts to close any system alert dialogs that may appear
+ */
+async function closeSystemAlertDialog(page: Page): Promise<void> {
+  try {
+    await page.locator('#systemAlert-dialog a').first().click();
+    logger.info('Closed system alert dialog');
+  } catch (error: unknown) {
+    // Silently handle system alert dialog errors as they're not critical
+    if (process.env.NODE_ENV !== 'production') {
+      if (error instanceof Error) {
+        logger.debug(`System alert dialog not found or failed to close: ${error.message}`);
+      } else {
+        logger.debug('Unknown error while closing system alert dialog');
+      }
+    }
+  }
+}
+
 
 
 test('fill meckano hours after login', async ({ page }: { page: Page }) => {
@@ -220,8 +239,8 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
         }
         
         // Click the button
-        await page.click('#submitButtons');
-        logger.info('Login credentials submitted');
+    await page.click('#submitButtons');
+    logger.info('Login credentials submitted');
         break;
         
       } catch (error) {
@@ -240,6 +259,9 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     logger.info('Waiting for confirmation code if needed...');
     await page.waitForURL('**/#dashboard', { timeout: config.timeouts.login });
     logger.success('Successfully logged in and navigated to dashboard');
+    
+    // Close any system alert dialogs after login
+    await closeSystemAlertDialog(page);
 
     // Navigate to monthly report
     await page.getByText('כפתור כניסה', { exact: true }).waitFor({ 
@@ -247,20 +269,11 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
       timeout: config.timeouts.navigation 
     });
     
-    try {
-      await page.locator('#systemAlert-dialog a').first().click();
-    } catch (error: unknown) {
-      // Silently handle system alert dialog errors as they're not critical
-      if (process.env.NODE_ENV !== 'production') {
-        if (error instanceof Error) {
-          console.error('Click failed:', error.message);
-        } else {
-          console.error('Unknown error during click.');
-        }
-      }
-    }
     await page.locator('a:has-text("דוח חודשי")').click();
     logger.info('Navigated to monthly report');
+    
+    // Close any system alert dialogs after navigation
+    await closeSystemAlertDialog(page);
    
 
     // Wait for table to load
@@ -327,7 +340,7 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
       
       // Only wait for next row if we're not at the last row
       if (i < rowCount - 1) {
-        await waitForNextRow(rows, i);
+      await waitForNextRow(rows, i);
       }
     }
 

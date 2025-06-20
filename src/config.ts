@@ -45,21 +45,21 @@ function createConfig(): AppConfig {
   return {
     email: validateEnvVar('MECKANO_EMAIL', process.env.MECKANO_EMAIL),
     password: validateEnvVar('MECKANO_PASSWORD', process.env.MECKANO_PASSWORD),
-    baseUrl: 'https://app.meckano.co.il',
-    timeouts: {
-      login: 120000, // 2 minutes
-      navigation: 20000, // 20 seconds
-      element: 15000, // 15 seconds
-    },
-    time: {
-      minEntranceHour: getEnvNumber('MIN_ENTRANCE_HOUR', 7),
-      minEntranceMinute: getEnvNumber('MIN_ENTRANCE_MINUTE', 45),
-      maxEntranceHour: getEnvNumber('MAX_ENTRANCE_HOUR', 9),
-      maxEntranceMinute: getEnvNumber('MAX_ENTRANCE_MINUTE', 30),
-      minWorkHours: getEnvNumber('MIN_WORK_HOURS', 9),
-      maxWorkHours: getEnvNumber('MAX_WORK_HOURS', 10),
-    },
-  };
+  baseUrl: 'https://app.meckano.co.il',
+  timeouts: {
+    login: 120000, // 2 minutes
+    navigation: 20000, // 20 seconds
+    element: 15000, // 15 seconds
+  },
+  time: {
+    minEntranceHour: getEnvNumber('MIN_ENTRANCE_HOUR', 7),
+    minEntranceMinute: getEnvNumber('MIN_ENTRANCE_MINUTE', 45),
+    maxEntranceHour: getEnvNumber('MAX_ENTRANCE_HOUR', 9),
+    maxEntranceMinute: getEnvNumber('MAX_ENTRANCE_MINUTE', 30),
+    minWorkHours: getEnvNumber('MIN_WORK_HOURS', 9),
+    maxWorkHours: getEnvNumber('MAX_WORK_HOURS', 10),
+  },
+}; 
 }
 
 let _config: AppConfig | null = null;

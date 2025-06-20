@@ -164,21 +164,22 @@ export default function InstructionsPage() {
               <div className="bg-black/30 rounded-lg p-6 mb-4">
                 <h3 className="text-lg font-semibold text-white mb-3">Choose your run mode:</h3>
                 
-                {/* Headless Mode */}
+                {/* Headed Mode - Now First and Recommended */}
                 <div className="mb-6">
-                  <h4 className="font-semibold text-green-400 mb-2">🚀 Headless Mode (Recommended)</h4>
-                  <p className="text-white/80 text-sm mb-2">Runs in the background without opening a browser window:</p>
-                  <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm">
-                    <span className="text-white">npm test</span>
-                  </div>
-                </div>
-
-                {/* Headed Mode */}
-                <div className="mb-6">
-                  <h4 className="font-semibold text-blue-400 mb-2">👁️ Headed Mode (For Debugging)</h4>
+                  <h4 className="font-semibold text-green-400 mb-2">👁️ Headed Mode (Recommended)</h4>
                   <p className="text-white/80 text-sm mb-2">Opens browser window so you can watch the automation:</p>
                   <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm">
                     <span className="text-white">npx playwright test --headed</span>
+                  </div>
+                  <p className="text-yellow-300 text-xs mt-2 italic">*Best for typing the activation code if prompted</p>
+                </div>
+
+                {/* Headless Mode */}
+                <div className="mb-6">
+                  <h4 className="font-semibold text-blue-400 mb-2">🚀 Headless Mode</h4>
+                  <p className="text-white/80 text-sm mb-2">Runs in the background without opening a browser window:</p>
+                  <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm">
+                    <span className="text-white">npm test</span>
                   </div>
                 </div>
 
