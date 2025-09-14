@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Canvas Drawer</title>
+		<style>
+			body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				margin: 0;
+			}
+			canvas {
+				border: 1px solid black;
+				margin: 10px;
+			}
+			iframe {
+				border: none;
+				width: 400px;
+				height: 100px;
+			}
+			button {
+				height: 50px;
+				border: 1px solid #9e9e9e;
+				background: #e292ca;
+				border-radius: 3px;
+				font-size: 14px;
+				font-weight: bold;
+			}
+			#buttons {
+				display: flex;
+				gap: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>One Shape Magic 🪄 🎩</h1>
+		<canvas id="myCanvas" width="400" height="400"></canvas>
+		<div id="buttons">
+			<button onclick="drawCircle()">Draw Circle</button>
+			<!-- Iframe that loads the square drawer -->
+			<iframe src="iframe.html"></iframe>
+			<my-button></my-button>
+		</div>
+		<script>
+			function drawCircle() {
+				var canvas = document.getElementById('myCanvas');
+				var ctx = canvas.getContext('2d');
+
+				// Clear the canvas before drawing a new circle
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+				// Set circle properties
+				var x = canvas.width / 2;
+				var y = canvas.height / 2;
+				var radius = 50;
+
+				// Draw the circle
+				ctx.beginPath();
+				ctx.arc(x, y, radius, 0, 2 * Math.PI);
+				ctx.strokeStyle = 'blue';
+				ctx.lineWidth = 5;
+				ctx.stroke();
+			}
+
+			function drawSquare() {
+				var canvas = document.getElementById('myCanvas');
+				var ctx = canvas.getContext('2d');
+
+				// Clear the canvas before drawing a new square
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+				// Set square properties
+				var x = 50;
+				var y = 50;
+				var size = 100;
+
+				// Draw the square
+				ctx.beginPath();
+				ctx.rect(x, y, size, size);
+				ctx.strokeStyle = 'red';
+				ctx.lineWidth = 5;
+				ctx.stroke();
+			}
+
+			function resetCanvas() {
+				var canvas = document.getElementById('myCanvas');
+				var ctx = canvas.getContext('2d');
+
+				// Clear the canvas before drawing a new square
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+			}
+
+			// Listen for messages from the iframe
+			window.addEventListener(
+				'message',
+				function (event) {
+					if (event.origin !== window.location.origin) {
+						return; // Ignore messages from different origins
+					}
+
+					if (event.data === 'DRAW_SQUARE') {
+						drawSquare();
+					}
+				},
+				false
+			);
+
+			// Define the custom element
+			class ButtonInsideShadowDom extends HTMLElement {
+				constructor() {
+					super();
+
+					// Attach a shadow root to the element
+					const shadow = this.attachShadow({ mode: 'open' });
+
+					// Create elements inside the shadow root
+					const wrapper = document.createElement('div');
+					const button = document.createElement('button');
+					const paragraph = document.createElement('p');
+
+					// Set text content
+					button.textContent = 'Reset';
+					button.id = 'reset-button';
+
+					// Style the shadow DOM elements
+					const style = document.createElement('style');
+
+					style.textContent = `
+                        button {        
+                            height: 50px;
+                            border: 1px solid #9E9E9E;
+                            background: #e292ca;
+                            border-radius: 3px;
+                            font-size: 14px;
+                            font-weight: bold;
+                        }   
+                    `;
+					// Append elements to the shadow root
+					shadow.appendChild(style);
+					shadow.appendChild(wrapper);
+					wrapper.appendChild(button);
+					wrapper.appendChild(paragraph);
+
+					// Add an event listener to the button
+					button.addEventListener('click', () => {
+						resetCanvas();
+					});
+				}
+			}
+
+			// Register the custom element
+			customElements.define('my-button', ButtonInsideShadowDom);
+		</script>
+	</body>
+</html>
