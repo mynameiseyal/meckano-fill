@@ -212,8 +212,8 @@ async function closeSystemAlertDialog(page: Page): Promise<void> {
 
 
 test('fill meckano hours after login', async ({ page }: { page: Page }) => {
-  // Set a longer timeout for this test (15 minutes)
-  test.setTimeout(15 * 60 * 1000);
+  // Set a longer timeout for processing all rows (5 minutes)
+  test.setTimeout(5 * 60 * 1000);
   
   logger.info('Starting Meckano hours filling automation');
   
@@ -230,12 +230,27 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
 
   try {
     // Navigate to login page
-    await page.goto(config.baseUrl);
+    logger.info(`Attempting to navigate to ${config.baseUrl}`);
+    await page.goto(config.baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     logger.info(`Navigated to ${config.baseUrl}`);
 
+    // Wait for login form to be ready
+    logger.info('Waiting for username textbox...');
+    await page.getByRole('textbox').first().waitFor({ timeout: 10000 });
+    logger.info('Username field found');
+
     // Fill login credentials
-    await page.fill('#email', config.email);
-    await page.fill('#password', config.password);
+    logger.info('Filling username...');
+    await page.getByRole('textbox').first().fill(config.email);
+    logger.info('Username filled');
+    
+    logger.info('Waiting for password field...');
+    await page.getByRole('textbox', { name: /סיסמה/ }).waitFor({ timeout: 5000 });
+    logger.info('Password field found');
+    
+    logger.info('Filling password...');
+    await page.getByRole('textbox', { name: /סיסמה/ }).fill(config.password);
+    logger.info('Password filled');
     
     // Wait for submit button to be clickable and click it with retry logic
     logger.info('Attempting to click submit button...');
@@ -244,12 +259,12 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     
     while (loginAttempts < maxLoginAttempts) {
       try {
-        // Wait for button to be visible and enabled
-        await page.waitForSelector('#submitButtons', { state: 'visible', timeout: 10000 });
+        // Wait for login button to be visible and enabled
+        await page.getByRole('button', { name: 'התחברות' }).waitFor({ state: 'visible', timeout: 10000 });
         await page.waitForTimeout(500); // Small delay to ensure button is fully ready
         
         // Ensure button is enabled before clicking
-        const isEnabled = await page.isEnabled('#submitButtons');
+        const isEnabled = await page.getByRole('button', { name: 'התחברות' }).isEnabled();
         if (!isEnabled) {
           logger.warn(`Submit button is disabled, waiting...`);
           await page.waitForTimeout(1000);
@@ -258,7 +273,7 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
         }
         
         // Click the button
-    await page.click('#submitButtons');
+    await page.getByRole('button', { name: 'התחברות' }).click();
     logger.info('Login credentials submitted');
         break;
         
