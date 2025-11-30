@@ -310,7 +310,7 @@ test('fill meckano hours after login', async ({ page }: { page: Page }) => {
     await closeSystemAlertDialog(page);
 
     // Wait for table to load
-    await page.getByRole('cell', { name: 'תאריך' }).locator('span').waitFor({ 
+    await page.getByRole('columnheader', { name: 'תאריך' }).waitFor({ 
       state: 'visible', 
       timeout: config.timeouts.element 
     });
