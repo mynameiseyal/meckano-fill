@@ -89,25 +89,19 @@ const fallbackContent: Record<string, string> = {
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }`,
-  'playwright.config.ts': `import { defineConfig, devices } from '@playwright/test';
+  'playwright.config.ts': `import { defineConfig } from '@playwright/test';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 export default defineConfig({
-  testDir: './tests',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  timeout: 10 * 60 * 1000, // 10 minutes for all tests
   use: {
-    baseURL: 'https://app.meckano.co.il',
-    trace: 'on-first-retry',
+    headless: false,
+    viewport: { width: 1280, height: 720 },
+    video: 'on',
   },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
 });`,
   'tests/fill-hours.spec.ts': `import { test, Locator, Page } from '@playwright/test';
 import { config } from '../src/config';
@@ -720,7 +714,7 @@ function getFileContent(filePath: string, fileName: string): string | null {
 export async function GET(request: NextRequest) {
   try {
     // Security: Rate limiting
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         { error: 'Too many download attempts. Please try again later.' },
