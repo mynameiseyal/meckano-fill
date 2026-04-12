@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFileSync, existsSync } from 'fs'
 import { join, resolve, relative } from 'path'
-import archiver from 'archiver'
+import JSZip from 'jszip'
 
 export const dynamic = 'force-dynamic'
 
@@ -722,12 +722,8 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Create a new archiver instance
-    const archive = archiver('zip', {
-      zlib: { level: 9 } // Maximum compression
-    })
+    const zip = new JSZip()
 
-    // Define the files to include in the zip
     const filesToInclude = [
       { source: 'package.json', destination: 'package.json' },
       { source: 'tsconfig.json', destination: 'tsconfig.json' },
@@ -741,10 +737,8 @@ export async function GET(request: NextRequest) {
 
     let addedFiles = 0;
 
-    // Add files to the archive with security validation
     for (const file of filesToInclude) {
       try {
-        // Security: Validate file is in allowed list
         if (!ALLOWED_FILES.has(file.source)) {
           console.warn(`File not in allowed list: ${file.source}`)
           continue
@@ -753,7 +747,6 @@ export async function GET(request: NextRequest) {
         const filePath = resolve(join(process.cwd(), file.source))
         const projectRoot = resolve(process.cwd())
         
-        // Security: Ensure file is within project directory (prevent path traversal)
         const relativePath = relative(projectRoot, filePath)
         if (relativePath.startsWith('..') || relativePath.includes('..')) {
           console.warn(`Path traversal attempt detected: ${file.source}`)
@@ -762,7 +755,7 @@ export async function GET(request: NextRequest) {
 
         const fileContent = getFileContent(filePath, file.source);
         if (fileContent) {
-          archive.append(fileContent, { name: file.destination })
+          zip.file(file.destination, fileContent)
           addedFiles++;
         } else {
           console.warn(`Skipping file ${file.source}: no content available`)
@@ -774,7 +767,6 @@ export async function GET(request: NextRequest) {
 
     console.log(`Added ${addedFiles} files to archive`);
 
-    // Add .env.example file with template content
     const envContent = `# Meckano Login Credentials
 # Replace with your actual Meckano login details
 MECKANO_EMAIL=your-email@example.com
@@ -791,9 +783,8 @@ EXIT_END=18:00
 # WORK_START_TIME=09:00
 # WORK_END_TIME=17:30`
 
-    archive.append(envContent, { name: '.env.example' })
+    zip.file('.env.example', envContent)
 
-    // Add installation instructions
     const installInstructions = `# Meckano Fill - Installation Instructions
 
 ## Prerequisites: Install Node.js and npm
@@ -912,38 +903,20 @@ npx playwright install chromium
 For detailed help and troubleshooting, check the README.md file or visit the GitHub repository.
 `
 
-    archive.append(installInstructions, { name: 'INSTALL.md' })
+    zip.file('INSTALL.md', installInstructions)
 
-    // Finalize the archive
-    archive.finalize()
+    const buffer = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 9 }
+    })
 
-    // Convert archive to buffer
-    const chunks: Buffer[] = []
-    archive.on('data', (chunk: Buffer) => chunks.push(chunk))
-    
-    return new Promise<NextResponse>((resolve, reject) => {
-      archive.on('end', () => {
-        const buffer = Buffer.concat(chunks)
-        
-        const response = new NextResponse(buffer, {
-          headers: {
-            'Content-Type': 'application/zip',
-            'Content-Disposition': 'attachment; filename="meckano-fill.zip"',
-            'Content-Length': buffer.length.toString()
-          }
-        })
-        
-        resolve(response)
-      })
-
-      archive.on('error', (error: Error) => {
-        // Log error internally without exposing details
-        console.error('Archive creation failed:', error.message)
-        reject(new NextResponse(
-          JSON.stringify({ error: 'Failed to create zip file' }), 
-          { status: 500, headers: { 'Content-Type': 'application/json' } }
-        ))
-      })
+    return new NextResponse(buffer.buffer as ArrayBuffer, {
+      headers: {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': 'attachment; filename="meckano-fill.zip"',
+        'Content-Length': buffer.length.toString()
+      }
     })
 
   } catch (error) {
